@@ -6,6 +6,8 @@ require 'haml-coderay'
 require 'sinatra/content_for2'
 require 'sinatra/static_assets'
 require 'sinatra/url_for'
+require 'active_support'  
+require 'active_support/inflector'
 
 class App < Sinatra::Base                 
   helpers Sinatra::ContentFor2
@@ -22,8 +24,9 @@ class App < Sinatra::Base
       posts.delete('..')
         
       @posts = []
-      posts.each do |post|                                     
-        @posts << { title: post, url: '/blog/' + post.sub(/\.\w*$/,'') }
+      posts.each do |post|                      
+        title = post.sub(/\.\w*$/,'')               
+        @posts << { title: title.titleize, url: '/blog/' + title }
       end
                   
       haml :blog
