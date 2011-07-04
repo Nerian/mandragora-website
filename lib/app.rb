@@ -6,67 +6,32 @@ require 'haml-coderay'
 require 'sinatra/content_for2'
 require 'sinatra/static_assets'
 require 'sinatra/url_for'
-require 'active_support'  
-require 'active_support/inflector'
 
 class App < Sinatra::Base                 
   helpers Sinatra::ContentFor2
   register Sinatra::StaticAssets          
   helpers Sinatra::UrlForHelper                               
+   
+  set :public, Proc.new { File.join(File.dirname(__FILE__), '..', '_site') }         
   
-  Haml::Filters::CodeRay.encoder_options = { :css => :class } 
-  set :markdown, :layout_engine => :haml, :layout => :layout     
-  
-  ['/', '/blog'].each do |path|
-    get path do                                          
-      posts = Dir.new(File.join(File.dirname(__FILE__), '..', 'views', "posts")).entries
-      posts.delete('.')
-      posts.delete('..')
-        
-      @posts = []
-      posts.each do |post|                      
-        title = post.sub(/\.\w*$/,'')               
-        @posts << { title: title.titleize, url: '/blog/' + title }
-      end
-                  
-      haml :blog
-    end    
-  end 
-  
-  get '/blog/:name' do    
-    markdown :"posts/#{params[:name]}"
+  get '/scss/stylesheet.sass' do
+    sass :'sass/stylesheet'
+  end  
+                                                                            
+  get '/' do
+    File.read('_site/index.html')
   end
-
-  get '/proyectos' do
-    haml :proyectos
-  end              
-
-  get '/about' do
-    haml :about
-  end         
-
-  get '/:id.css' do
-    sass :"scss/#{params[:id]}"
-  end     
-  # start the server if ruby file executed directly
-  run! if app_file == $0
-end     
-
-module Haml
-  module Helpers
-    def partial(template, *args)
-      template_array = template.to_s.split('/')
-      template = template_array[0..-2].join('/') + "/_#{template_array[-1]}"
-      options = args.last.is_a?(Hash) ? args.pop : {}
-      options.merge!(:layout => false)
-      if collection = options.delete(:collection) then
-        collection.inject([]) do |buffer, member|
-          buffer << haml(:"#{template}", options.merge(:layout =>
-          false, :locals => {template_array[-1].to_sym => member}))
-        end.join("\n")
-      else
-        haml(:"#{template}", options)
-      end
+  
+  get '/blog/*' do
+    File.read("_site/#{params[:splat].join}")
+  end
+     
+  ['/proyectos','/equipo','/about'].each do |path|
+    get path do
+      File.read("_site/#{path}.html")    
     end
   end
+
+  # start the server if ruby file executed directly
+  run! if app_file == $0
 end

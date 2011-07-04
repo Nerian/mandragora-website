@@ -2,9 +2,6 @@ GEM
   remote: http://rubygems.org/
   specs:
     RedCloth (4.2.7)
-    active_support (3.0.0)
-      activesupport (= 3.0.0)
-    activesupport (3.0.0)
     coderay (0.9.8)
     emk-sinatra-url-for (0.2.1)
       sinatra (>= 0.9.1.1)
@@ -34,7 +31,6 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
-  active_support
   emk-sinatra-url-for
   haml
   haml-coderay
